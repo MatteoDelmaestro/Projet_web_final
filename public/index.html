@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My CSS experiment</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+    <body class="background">
+      
+
+
+      <div id="app">
+        <h1 class="titre">Trok ' mwa</h1>
+        <span class="linkcenter">
+          <ul>
+            <li class="header" @click="currentPage ='accueil'"> accueil</li>
+            <li class="header" v-bind:class="{cacher: userid == -1}" @click="currentPage ='jeveuxvendre'"> <p>je veux vendre </p></li>
+            <li class="header" v-bind:class="{cacher: userid != -1}" @click="currentPage ='inscription'"><p>inscription/connexion</p></li>
+            <li class="header" v-bind:class="{cacher: userid == -1}" @click="currentPage ='monCompte'"><p>Mon Compte</p></li>
+         </ul>
+        </span>
+        
+
+        <div class="mainpage">
+
+        <!-- c'est la page d'acceuil -->
+        <section v-if="currentPage === 'accueil'" id="accueil">
+            <span class="linkcenter">
+              <h4> Recherche: </h4>
+              <select  v-model="categorieFiltre">
+                <option value="all">All</option>
+                <option value="meuble">Meuble</option>
+                <option value="electronique">Electronique</option>
+                <option value="informatique">Informatique</option>
+                <option value="vehicule">Véhicule</option>
+                <option value="XX">Autre</option>
+              </select>
+            </span>
+
+            <span class="zoneGrise">
+              <ul class="listeObjet" v-for="(item, index) in myListfilter">
+                <li > 
+                  <img src="/images/no-image.png"> 
+                </li>
+                <li>
+                  {{ item.nom }}
+                </li>
+                <li>
+                  <button class="lienObjet" @click="objetid = index, currentPage ='objet'">Plus d'info</button>
+                </li>
+                 <!-- <li>
+                  <button  @click="deleteItem(item)">supprimer </button>
+                </li> -->
+              </ul>
+            </span>
+        </section>
+
+
+         <!-- c'est la page de creation de vente -->
+        <section v-else-if="currentPage === 'jeveuxvendre'" id="jeveuxvendre">
+          <div class="contenue">
+            <div class="vente">
+              <fieldset>
+                <legend>Detail du produit : </legend>
+                <ul class="justifier">
+                  <li>
+                    <input type="text" v-model="nomObjet" placeholder="nom de l'objet" required >
+                  </li>
+                  <li>
+                    <input class="decale"type="file" name="imageObjet"> 
+
+                  </li>
+                  <li>
+                    <input type="number" v-model="prixObjet" placeholder="prix de l'objet" required>
+                  </li>
+                  <li>
+                    <p>catégorie de l'objet</p>
+                    <select type="select" v-model="categorieObjet" placeholder=" choisir" required> 
+                      <option value="meuble" selected>meuble</option>
+                        <option value="electronique">électronique</option>
+                        <option value="informatique">informatique</option>
+                        <option value="vehicule">véhicule</option>
+                        <option value="XX">Autre</option>
+                    </select>
+                  </li>
+                  <li>
+                    <textarea type="text" v-model="descriptionObjet" placeholder="description de l'objet"></textarea>
+                  </li>
+
+                  <li>
+                    <button class="lienObjet" @click="verifobjet">Ajouter !</button>
+                    <button class="btn-suppr" @click="annuler(), currentPage = 'accueil'">Annuler !</button>
+                  </li>
+                </ul>
+                </fieldset>
+              </div>
+            </div>
+        </section>
+
+
+          <!-- ceci est la page d'inscrition & connexion-->
+        <section v-else-if="currentPage === 'inscription'" id="inscription">
+              <div class="contenue">
+                <div class="inscription">
+                <fieldset>
+                  <legend> inscription : </legend>
+                  <ul>
+                    <li>
+                      <input type="text" v-model="nomUser" placeholder="nom">
+                    </li>
+                    <li>
+                      <input type="text" v-model="prenomUser" placeholder="prenom">
+                    </li>
+                    <li>
+                      <input type="mail" v-model="mail" placeholder="mail@mail.com">
+                    </li>
+                    <li>
+                      <input type="password" v-model="mdp" placeholder="mot de passe">
+                    </li>
+                    <li>
+                      <input type="password" v-model="verifmdp" placeholder="verification mot de passe">
+                    </li>
+                    <li>
+                      <button class="btn-connexion" @click="verifInscri(), currentPage=goto">enregistrer</button>
+                    </li>
+                  </ul>
+                </fieldset>
+                </div>
+
+                <div class="connexion">          
+                <fieldset>
+                  <legend> connexion : </legend>
+                  <ul>
+                    <li>
+                      <input type="mail" v-model="username" placeholder="username">
+                    </li>
+                    <li>
+                      <input type="password" v-model="pasword" placeholder="mot de passe">
+                    </li>
+                    <li>
+                      <button class="btn-connexion2" @click="connexion(), currentPage=goto">connexion</button>
+                    </li>
+                  </ul>
+                </fieldset>
+                </div>
+
+              </div>
+        </section>
+
+        <!-- ceci est la page  mon compte -->
+        <section v-else-if="currentPage === 'monCompte'" id="monCompte">
+          <h1> Mon Compte</h1>
+            <ul class="listeObjet" v-for="(item, index) in listeObjetUser">
+                <li > 
+                  <img src="/images/no-image.png"> 
+                </li>
+                <li>
+                  {{ item.nom }}
+                </li>
+                <li>
+                 <button class="lienObjet" @click="idItemToUpdate=item.id, gotoMaj(item)">mettre à jour </button>
+                </li>
+                  <li>
+                    <button class="btn-suppr" @click="deleteItem(item.id)">supprimer </button>
+                  </li> 
+              </ul>
+            </span>
+            <button class="btn-deco" @click ="userid=-1, currentPage='accueil'">deconnexion</button>
+
+        </section>
+
+          <!-- ceci est la page modifier objet -->
+        <section v-else-if="currentPage === 'Maj'" id="Maj">
+           <h1> {{myList[idItemToUpdate].nom}}</h1>
+           <div class="contenue">
+              <div class="vente">
+               <fieldset>
+                  <ul>
+                      <li>
+                        <input type="text" v-model="nomObjet2" >
+                      </li>
+                      <li>
+                        <input class="decale"type="file" name="imageObjet"> 
+                      </li>
+                      <li>
+                        <input type="number" v-model="prixObjet2" >
+                      </li>
+                      <li>
+                        <p>catégorie de l'objet</p>
+                        <select type="select" v-model="categorieObjet2" placeholder=" choisir">
+                          <option value="meuble" selected>meuble</option>
+                            <option value="electronique">électronique</option>
+                            <option value="informatique">informatique</option>
+                            <option value="vehicule">véhicule</option>
+                            <option value="XX">Autre</option>
+                        </select>
+                      </li>
+                      <li>
+                        <textarea type="text" v-model="descriptionObjet2" placeholder="description de l'objet"></textarea>
+                      </li>
+
+                      <li>
+                        <button class="lienObjet" @click="updateItem(idItemToUpdate)">Modifier</button>
+                        <button class="btn-suppr" @click="annuler(), currentPage = 'accueil'">Annuler !</button>
+                      </li>
+                    </ul>
+                  </fieldset>
+                </div>
+              </div>
+
+        </section>
+
+     
+        <!-- c'est la page detail d'un objet -->
+        <section v-else="currentPage === 'objet'" id="objet">
+          <ul>
+            <h1> {{myList[objetid].nom}}</h1>
+            <li > <img src="/images/no-image.png"></li>
+            <textarea class="description" readonly> {{myList[objetid].description}}</textarea>
+              <h4>Contact</h4>
+            <p class="contact"> {{customerList[myList[objetid].UidS].mailS}} </p>
+
+          </ul>
+        </section> 
+      </div>
+
+      <footer class="basdepage">
+        <div class="contenue1">
+          <p>Nous contacter :</p>
+          <p>mail@mail.com</p>
+          <p>+33123456789</p>
+          <p>3 rue des lilas, Paris,75012</p>
+        </div>
+
+          
+      </footer> 
+
+      </div>
+
+        
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.js"></script>
+<script type="text/javascript">
+
+    // Sans cette ligne + l'import de axios.js (2e <script>), this.$http ne fonctionnera pas
+ Vue.prototype.$http = axios
+
+
+ const app = new Vue({
+    el: '#app',
+    data: {
+
+      afficher:0,
+
+      currentPage: 'accueil',
+      nomObjet: '',
+      imageObjet: null,
+      prixObjet:'',
+      categorieObjet:'',
+      option:[
+      {text:'meuble',value:'meuble'},
+      {text:'mechanique',value:'mechanique'},
+      {text:'informatique',value:'informatique'},
+      {text:'livre',value:'livre'}
+      ],
+      descriptionObjet:'',
+      nameItem: '',
+      hobbitItem:'',
+      objetid:'',
+
+      categorieFiltre:'all',
+
+      myList: [],
+
+      customerList:[],
+
+
+      nomObjet2: '',
+      imageObjet2: null,
+      prixObjet2:'',
+      categorieObjet2:'',
+      descriptionObjet2:'',
+
+      nomUser:'',
+      prenomUser:'',
+      mail:'',
+      mdp:'',
+      verifmdp:'',
+
+      username:'',
+      pasword:'',
+      userid:-1,
+      goto:'',
+      idItemToUpdate:''
+
+
+
+
+  },
+  
+   created () {
+    // Ici, l'utilisation d'une fonction flêchée () => {} plutôt que function () {} est primordial !
+    // sans fonction fléchée, this.myList = ... ne fonctionnera pas comme prévu
+    this.$http.get('/myListS')
+      .then(myListS => {
+        console.log('affichage de ma liste', myListS)
+        this.myList = myListS.data
+      })
+      // .catch(err => {
+      //   console.log('error', err)
+      // })
+
+       this.$http.get('/userList')
+    .then(userList => {
+      console.log('affichage de ma liste', userList)
+      this.customerList = userList.data
+    })
+
+  },
+  computed:{
+    myListfilter () {
+      let myList = this.myList
+      if (this.categorieFiltre !=='all') {
+        myList = myList.filter((p)=>{
+          return p.catégorie === this.categorieFiltre
+        })
+      }
+      return myList
+    },
+    listeObjetUser(){
+      let myList = this.myList
+      if (this.userid !== -1) {
+        myList = myList.filter((p)=>{
+          return p.UidS === this.userid
+        })
+      }
+      return myList
+    }
+  },  
+
+  methods: {
+    addobject () {
+      
+      const newObj = {
+        
+        nom: this.nomObjet,
+        image: this.imageObjet,
+        prix: this.prixObjet,
+        catégorie: this.categorieObjet,
+        description: this.descriptionObjet,
+        Uid : this.userid
+      }
+      // this.myList.push(newObj)
+
+      this.$http.post('/myListS', newObj)
+      .then(() =>{
+        console.log("ok")
+        //this.myList.push(newObj)
+      })
+      this.$http.get('/myListS')
+      .then(myListS => {
+        console.log('affichage de ma liste', myListS)
+        this.myList = myListS.data
+      })
+      this.nomObjet = ''
+      this.imageObjet=''
+      this.prixObjet=''
+      this.categorieObjet=''
+      this.descriptionObjet=''
+
+     
+  
+     
+    },
+
+
+
+    adduser(){
+
+      const newUser = {
+        nom : this.nomUser,
+        prenom : this.prenomUser,
+        mailS : this.mail,
+        mdpS : this.mdp
+      }
+
+      this.$http.post('/userList', newUser)
+      .then(()=>{
+        console.log("ok add user")
+      })
+
+
+      this.$http.get('/userList')
+      .then(userList => {
+      console.log('affichage de ma liste', userList)
+      this.customerList = userList.data
+    })
+
+
+
+
+      this.nomUser = ''
+      this.prenomUser = ''
+      this.mail = ''
+      this.mdp = ''
+      this.verifmdp = ''
+
+
+    },
+
+
+
+
+
+    validateEmail(email) {
+      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
+
+
+
+    verifInscri(){
+      var erreur = 0
+      var email = this.mail
+      if(this.nomUser === ''){
+        alert("champ nom incorrect")
+        erreur +=1
+      }
+      if(this.prenomUser === ''){
+        alert("champ prénom incorrect")
+        erreur +=1
+      }
+
+        if (this.validateEmail(email)) {
+          
+        } else {
+          alert("champ email incorrect")
+          erreur +1
+        }
+
+      if((this.mdp !== this.verifmdp)||((this.mdp || this.verifmdp) ==='') ){
+         alert("les mots de passe ne corresponde pas")
+         erreur +=1
+      }
+      if(erreur === 0){
+        this.adduser()
+        this.goto = 'accueil'
+      }else{
+        this.nomUser = ''
+      this.prenomUser = ''
+      this.mail = ''
+      this.mdp = ''
+      this.verifmdp = ''
+      }
+    },
+
+
+    verifobjet(){
+      var erreur =0
+      if (this.nomObjet == ''){
+        alert("champ nom de l'objet non valide")
+        erreur+=1
+      }
+      if(this.prixObjet == ''){
+        alert("champ prix de l'objet non valide")
+        erreur+=1
+      }
+      if(this.categorieObjet == ''){
+        alert("veuillez choisir une catégorie")
+        erreur +=1
+      }
+      if(erreur ==0){
+        this.addobject()
+      }
+    },
+
+
+
+    annuler(){
+      this.nomObjet = ''
+      this.imageObjet=''
+      this.prixObjet=''
+      this.categorieObjet=''
+      this.descriptionObjet=''
+    },
+    // filtrer(){
+    //   myListfiltrer = myList.filter()
+    // }
+  
+    deleteItem(item){
+      
+
+
+     
+      this.$http.delete('/myListS/' + item)
+      this.$http.get('/myListS')
+      .then(myListS => {
+        console.log('affichage de ma liste', myListS)
+        this.myList = myListS.data
+        
+      })
+
+      
+      .then(()=>{
+        console.log('item suppr')
+        // const index = myListS.findIndex(elem=>elem.id === id)
+        // if(index !== -1){
+          //myListS.splice(item,1)
+
+        //}
+
+      })
+    },
+
+        updateItem(item){
+      console.log(item)
+      const updatedObj = {
+        
+        nom: this.nomObjet2,
+        image: this.imageObjet2,
+        prix: this.prixObjet2,
+        catégorie: this.categorieObjet2,
+        description: this.descriptionObjet2,
+        ID: item
+        
+        
+      }
+        
+        
+        console.log(updatedObj)
+        
+        
+      
+
+      this.$http.post('/myListServeur', updatedObj )
+      .then(()=>{
+        console.log('item updated')
+        
+        
+
+      })
+
+      this.$http.get('/myListS')
+      .then(myListS => {
+        console.log('affichage de ma liste', myListS)
+        this.myList = myListS.data
+        
+      })
+
+
+      this.nomObjet2 = ''
+      this.prixObjet2=''
+      this.categorieObjet2=''
+      this.descriptionObjet2=''
+      this.currentPage='monCompte'
+
+
+
+    },
+
+    // autoconnec(){
+    //   for(i=0 ;i< 2 ;i++){
+    //     if(this.mail === this.customerList[i].mailS){
+    //       if (this.mdp === this.customerList[i].mdpS) {
+    //         this.userid = i
+
+    //       }
+    //     }
+    //   }
+
+    // },
+    connexion(){
+      this.goto =''
+      // var usrname = this.username
+      // var motdepasse = this.pasword
+      
+
+      for(i=0 ;i< this.customerList.length ;i++){
+        
+        if (this.username === this.customerList[i].mailS){
+          if (this.pasword === this.customerList[i].mdpS){
+            this.goto = 'accueil'
+              this.userid = i
+              this.username=''
+              this.pasword=''
+              return
+          }
+        }
+          
+        
+      }
+      if (this.userid == -1) {
+        this.pasword=''
+        alert ("username ou mot de passe incorrect")
+        return
+      }
+         
+    },
+
+    gotoMaj(item){
+      this.nomObjet2 = item.nom,
+      this.prixObjet2=item.prix
+      this.categorieObjet2=item.catégorie
+      this.descriptionObjet2=item.description
+      this.currentPage="Maj"
+    }
+
+
+  }
+    
+     
+})
+
+
+  
+
+</script>
+  </body>
+</html>
+
+
+
